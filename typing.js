@@ -27,13 +27,13 @@
     け: ['ke'],
     こ: ['ko', 'co'],
     さ: ['sa'],
-    し: ['shi', 'si', 'ci'],
+    し: ['si', 'shi', 'ci'],
     す: ['su'],
     せ: ['se', 'ce'],
     そ: ['so'],
     た: ['ta'],
-    ち: ['chi', 'ti'],
-    つ: ['tsu', 'tu'],
+    ち: ['ti', 'chi'],
+    つ: ['tu', 'tsu'],
     て: ['te'],
     と: ['to'],
     な: ['na'],
@@ -43,7 +43,7 @@
     の: ['no'],
     は: ['ha'],
     ひ: ['hi'],
-    ふ: ['fu', 'hu'],
+    ふ: ['hu', 'fu'],
     へ: ['he'],
     ほ: ['ho'],
     ま: ['ma'],
@@ -106,7 +106,8 @@
     ゃ: ['ya', 'ha', 'a'],
     ゅ: ['yu', 'hu', 'u'],
     ょ: ['yo', 'ho', 'o'],
-    ぁ: ['', 'ha', 'a'],
+    //        "ぁ": ["", "ha", "a"],
+    ぁ: ['', 'ha', 'a', 'wa'],
     ぃ: ['yi', 'hi', 'i'],
     ぅ: ['', 'hu', 'u'],
     ぇ: ['ye', 'he', 'e'],
@@ -126,14 +127,17 @@
   }
 
   /*
-     きゃきゅきょなどの変換
-     */
+   きゃきゅきょなどの変換
+   */
   function specificStringConvert(string) {
     var result = []
     switch (string[0]) {
       case 'き':
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
         result.push('k' + specificConvert(string[1])[0])
+        break
+      case 'く':
+        if (string[1] == 'ぁ') result.push('k' + specificConvert(string[1])[3])
         break
       case 'し':
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
@@ -183,8 +187,9 @@
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
         if (string[1] == 'ゃ' || string[1] == 'ゅ' || string[1] == 'ょ')
           result.push('j' + specificConvert(string[1])[2])
-        result.push('z' + specificConvert(string[1])[0])
+        if (string[1] != 'ぃ') result.push('j' + specificConvert(string[1])[2])
         result.push('j' + specificConvert(string[1])[0])
+        result.push('z' + specificConvert(string[1])[0])
         break
       case 'ぢ':
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
@@ -193,6 +198,10 @@
       case 'び':
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
         result.push('b' + specificConvert(string[1])[0])
+        break
+      case 'ぴ':
+        if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
+        result.push('p' + specificConvert(string[1])[0])
         break
       case 'で':
         if (string[1] == 'ぁ' || string[1] == 'ぅ' || string[1] == 'ぉ') break
@@ -391,8 +400,8 @@
   }
 
   /*
-     配列のx番目までのlengthの合計
-     */
+   配列のx番目までのlengthの合計
+   */
   function arrayInnerLength(array, x) {
     var sum = 0
     for (var i = 0; i < x; i++) {
@@ -503,6 +512,26 @@
     }
   }
 
+  // 次の正しいキー入力を取得
+  function getNextKey() {
+    //console.log("-----------------------------------------");
+    var temp = this.question[0]
+    var res = []
+    for (i = 0; i < temp.length; i++) {
+      if (typeof temp[i] == typeof []) {
+        if (temp[i][0].length <= this.currentIndex) {
+          res[temp[i][1].substr(this.currentIndex - temp[i][0].length, 1)] = ''
+        } else {
+          res[temp[i][0].substr(this.currentIndex, 1)] = ''
+        }
+      } else {
+        res[temp[i].substr(this.currentIndex, 1)] = ''
+      }
+    }
+    //console.log(res);
+    return res
+  }
+
   function isFinish() {
     if (this.answered == this.length) return true
     else return false
@@ -548,6 +577,7 @@
 
   _Typing.prototype.register = register
   _Typing.prototype.answer = answer
+  _Typing.prototype.getNextKey = getNextKey
   _Typing.prototype.isFinish = isFinish
   _Typing.prototype.getQuestion = getQuestion
   _Typing.prototype.getRemainedQuestion = getRemainedQuestion
